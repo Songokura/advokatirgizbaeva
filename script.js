@@ -22,7 +22,7 @@
   /* ---------- Lenis: плавная прокрутка ---------- */
   var lenis = null;
   if (!reduce && typeof Lenis !== 'undefined') {
-    lenis = new Lenis({ smoothWheel: true, lerp: 0.12, wheelMultiplier: 1 });
+    lenis = new Lenis({ smoothWheel: true, lerp: 0.2, wheelMultiplier: 1 });
     if (hasGsap) {
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
@@ -101,7 +101,7 @@
     entries.forEach(function (en) {
       if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px -4% 0px' });
   Array.prototype.forEach.call(document.querySelectorAll('.rv:not(.hero .rv)'), function (el) { io.observe(el); });
 
   /* ---------- Заголовки: строки выезжают ---------- */
@@ -115,8 +115,8 @@
       var inner = sp.lines.map(function (l) { var s = document.createElement('span'); s.innerHTML = l.innerHTML; l.innerHTML = ''; l.appendChild(s); return s; });
       gsap.set(inner, { yPercent: 108 });
       ScrollTrigger.create({
-        trigger: h, start: 'top 86%', once: true,
-        onEnter: function () { gsap.to(inner, { yPercent: 0, duration: 1, stagger: 0.09, ease: 'power3.out' }); }
+        trigger: h, start: 'top 96%', once: true,
+        onEnter: function () { gsap.to(inner, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out' }); }
       });
     });
   }
@@ -168,7 +168,7 @@
     if (!hasGsap) return;
     if (isMobile() || reduce) { setPan(isMobile() ? 0 : -1); return; }
     setPan(-1);
-    heroTl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 } });
+    heroTl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
     var D = 0.7, E = 'power1.inOut';
     LAYERS.forEach(function (L) { var el = hero.querySelector(L[0]); if (el) heroTl.to(el, { x: -L[1], duration: D, ease: E }, 0); });
     var spot = hero.querySelector('.spot'); if (spot) heroTl.to(spot, { x: 910, duration: D, ease: E }, 0);
@@ -187,7 +187,7 @@
   var plateTriggers = [];
   function addST(t) { plateTriggers.push(t.scrollTrigger || t); return t; }
   function flipTo(inner, on, delay) {
-    gsap.to(inner, { rotateX: on ? -180 : 0, duration: 1.05, delay: delay || 0, ease: 'power3.inOut', overwrite: true });
+    gsap.to(inner, { rotateX: on ? -180 : 0, duration: 0.6, delay: delay || 0, ease: 'power3.inOut', overwrite: 'auto' });
   }
   function setupPlates() {
     plateTriggers.forEach(function (t) { t.kill(); });
@@ -220,14 +220,14 @@
 
       /* приход: плита «откидывается» на петле верхнего края */
       addST(gsap.fromTo(plate, { rotateX: mobile ? -8 : -14, transformPerspective: 1400 }, { rotateX: 0, ease: 'none',
-        scrollTrigger: { trigger: plate, start: 'top bottom', end: mobile ? 'top 55%' : 'top 25%', scrub: true } }));
+        scrollTrigger: { trigger: plate, start: 'top bottom', end: mobile ? 'top 60%' : 'top 40%', scrub: true } }));
 
       var txt = plate.querySelector('.plate-text');
       if (txt) addST(gsap.fromTo(txt, { y: 48, opacity: 0 }, { y: 0, opacity: 1, ease: 'none',
-        scrollTrigger: { trigger: plate, start: 'top 90%', end: mobile ? 'top 40%' : 'top 20%', scrub: true } }));
+        scrollTrigger: { trigger: plate, start: 'top bottom', end: mobile ? 'top 60%' : 'top 45%', scrub: true } }));
       var ph = plate.querySelector('.service-photos');
       if (ph) addST(gsap.fromTo(ph, { y: 60, opacity: 0 }, { y: 0, opacity: 1, ease: 'none',
-        scrollTrigger: { trigger: ph, start: 'top 95%', end: 'top 45%', scrub: true } }));
+        scrollTrigger: { trigger: ph, start: 'top bottom', end: 'top 60%', scrub: true } }));
 
       /* тихий фон и фото - параллакс за весь проход плиты */
       var bg = plate.querySelector('.plate-bg svg');
@@ -241,16 +241,13 @@
       if (sp2) addST(gsap.fromTo(sp2, { rotation: 2, y: -22 }, { rotation: 2, y: 22, ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } }));
     });
 
-    /* таблички переворачиваются, когда въезжают в кадр (по времени, не держат прокрутку) */
+    /* таблички переворачиваются строго по прокрутке: доворот закончен, когда табличка в верхней половине экрана */
     Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) {
       var inner = f.querySelector('.dp-in, .tp-in');
       if (!inner) return;
       var k = parseFloat(f.style.getPropertyValue('--k')) || 0;
-      addST(ScrollTrigger.create({
-        trigger: f, start: mobile ? 'top 70%' : 'top 62%',
-        onEnter: function () { flipTo(inner, true, 0.15 + k * 0.18); },
-        onLeaveBack: function () { flipTo(inner, false, 0); }
-      }));
+      addST(gsap.fromTo(inner, { rotateX: 0 }, { rotateX: -180, ease: 'power1.inOut', immediateRender: false,
+        scrollTrigger: { trigger: f, start: 'top ' + (88 - k * 4) + '%', end: 'top ' + (55 - k * 4) + '%', scrub: true } }));
     });
   }
   /* карточки плиты «прокурор» переворачиваются и по касанию */
@@ -268,7 +265,7 @@
     if (!steps) return;
     if (!hasGsap) { steps.style.setProperty('--draw', '1'); return; }
     ScrollTrigger.create({
-      trigger: steps, start: 'top 78%', end: 'bottom 70%', scrub: 0.5,
+      trigger: steps, start: 'top 90%', end: 'top 45%', scrub: true,
       onUpdate: function (self) { steps.style.setProperty('--draw', self.progress.toFixed(4)); }
     });
   }
@@ -283,7 +280,7 @@
         cio.unobserve(en.target);
         var el = en.target, target = parseInt(el.getAttribute('data-count'), 10);
         if (reduce) { el.textContent = target; return; }
-        var t0 = null, dur = 1400;
+        var t0 = null, dur = 900;
         (function tick(ts) {
           if (!t0) t0 = ts;
           var p = Math.min(1, (ts - t0) / dur);

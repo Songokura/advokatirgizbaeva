@@ -341,6 +341,9 @@ h1,h2,h3{margin:0;font-weight:700}
 .sr-dial svg{width:100%;height:auto;display:block}
 .dial-hand{transform-origin:200px 200px;animation:spin 60s linear infinite}
 .dial-hand2{transform-origin:200px 200px;animation:spin 720s linear infinite}
+.sr-dial .dial-hand path,.sr-dial .dial-hand2 path{stroke:var(--ink)}
+.sr-dial circle[r="6"],.sr-dial text{fill:var(--ink)}
+.sec-inv .sr-dial>svg>g{stroke:#8DB0D6}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Договорные споры */
@@ -467,7 +470,7 @@ h1,h2,h3{margin:0;font-weight:700}
 .sticky-bar{display:none}
 
 /* Проявление */
-.rv{opacity:0;transform:translate3d(0,24px,0);transition:opacity var(--t3) var(--ease),transform var(--t3) var(--ease)}
+.rv{opacity:0;transform:translate3d(0,20px,0);transition:opacity .55s var(--ease),transform .55s var(--ease)}
 .rv.is-in{opacity:1;transform:none}
 .hero .rv{transition-duration:1.2s}
 
