@@ -22,7 +22,7 @@
   /* ---------- Lenis: плавная прокрутка ---------- */
   var lenis = null;
   if (!reduce && typeof Lenis !== 'undefined') {
-    lenis = new Lenis({ duration: 1.1, smoothWheel: true, lerp: 0.1 });
+    lenis = new Lenis({ smoothWheel: true, lerp: 0.12, wheelMultiplier: 1 });
     if (hasGsap) {
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
@@ -153,84 +153,114 @@
     }
   }
 
-  var heroPan = null;
+  /* ---------- Герой: камера едет к столу защиты, пока герой уходит вверх (без залипания) ---------- */
+  var heroTl = null;
+  var LAYERS = [['.ly-wall', 28, 1.04], ['.ly-bench', 56, 1.07], ['.ly-tables', 118, 1.11], ['.ly-fore', 200, 1.15]];
+  function setPan(pan) {
+    LAYERS.forEach(function (L) { var el = hero.querySelector(L[0]); if (el) gsap.set(el, { x: pan * -L[1], scale: L[2] }); });
+    var spot = hero.querySelector('.spot'); if (spot) gsap.set(spot, { x: (pan + 1) * 455 });
+    var lp = hero.querySelector('.lbl-pro'), ld = hero.querySelector('.lbl-def');
+    if (lp) gsap.set(lp, { opacity: .6 - pan * .38 }); if (ld) gsap.set(ld, { opacity: .6 + pan * .38 });
+    var pr = hero.querySelector('.portrait'); if (pr) gsap.set(pr, { x: pan * -22 });
+  }
   function setupHeroPan() {
-    if (heroPan) { heroPan.kill(); heroPan = null; }
-    hero.style.setProperty('--pan', '-1');
-    if (!hasGsap || isMobile() || reduce) { if (isMobile()) hero.style.setProperty('--pan', '0'); return; }
-    heroPan = ScrollTrigger.create({
-      trigger: heroWrap, start: 'top top', end: 'bottom bottom', scrub: 0.6,
-      onUpdate: function (self) {
-        var p = self.progress;
-        var eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-        hero.style.setProperty('--pan', String(-1 + eased * 2));
-      }
-    });
+    if (heroTl) { heroTl.scrollTrigger && heroTl.scrollTrigger.kill(); heroTl.kill(); heroTl = null; }
+    if (!hasGsap) return;
+    if (isMobile() || reduce) { setPan(isMobile() ? 0 : -1); return; }
+    setPan(-1);
+    heroTl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 } });
+    var D = 0.7, E = 'power1.inOut';
+    LAYERS.forEach(function (L) { var el = hero.querySelector(L[0]); if (el) heroTl.to(el, { x: -L[1], duration: D, ease: E }, 0); });
+    var spot = hero.querySelector('.spot'); if (spot) heroTl.to(spot, { x: 910, duration: D, ease: E }, 0);
+    var lp = hero.querySelector('.lbl-pro'), ld = hero.querySelector('.lbl-def');
+    if (lp) heroTl.to(lp, { opacity: .22, duration: D, ease: E }, 0);
+    if (ld) heroTl.to(ld, { opacity: .98, duration: D, ease: E }, 0);
+    var pr = hero.querySelector('.portrait'); if (pr) heroTl.to(pr, { x: -22, duration: D, ease: E }, 0);
+    var hin = hero.querySelector('.hero-in'); if (hin) heroTl.to(hin, { y: -80, opacity: .35, duration: 1 }, 0);
   }
 
   /* пауза анимаций сцены вне экрана */
   new IntersectionObserver(function (en) { hero.classList.toggle('is-off', !en[0].isIntersecting); }, { threshold: 0 }).observe(hero);
 
-  /* ---------- Плиты: --enter / --stay / --exit и переворот табличек ---------- */
+  /* ---------- Плиты: эффекты идут на ходу прокрутки, плиты не залипают ----------
+     Всё анимируется transform/opacity напрямую (без CSS-переменных на всё дерево). */
   var plateTriggers = [];
+  function addST(t) { plateTriggers.push(t.scrollTrigger || t); return t; }
+  function flipTo(inner, on, delay) {
+    gsap.to(inner, { rotateX: on ? -180 : 0, duration: 1.05, delay: delay || 0, ease: 'power3.inOut', overwrite: true });
+  }
   function setupPlates() {
     plateTriggers.forEach(function (t) { t.kill(); });
     plateTriggers = [];
-    var plates = Array.prototype.slice.call(document.querySelectorAll('.plate'));
-    plates.forEach(function (p) { p.style.setProperty('--enter', '1'); p.style.setProperty('--stay', '0'); p.style.setProperty('--exit', '0'); });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) { f.style.setProperty('--flip', '0'); });
-    if (!hasGsap) { Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) { f.style.setProperty('--flip', '1'); }); return; }
-
-    var wraps = Array.prototype.slice.call(document.querySelectorAll('.pw[data-plate]'));
+    var flipsAll = document.querySelectorAll('.dp-in, .tp-in');
+    if (!hasGsap || reduce) {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) { f.style.setProperty('--flip', '1'); });
+      return;
+    }
+    gsap.set(flipsAll, { rotateX: 0 });
     var mobile = isMobile();
+    var plates = Array.prototype.slice.call(document.querySelectorAll('.plate'));
 
-    wraps.forEach(function (w) {
-      var plate = w.querySelector('.plate');
-      var idx = plates.indexOf(plate);
-      var prev = idx > 0 ? plates[idx - 1] : null;
-      var flips = Array.prototype.slice.call(plate.querySelectorAll('[data-flip]'));
-
-      if (!mobile) {
-        plateTriggers.push(ScrollTrigger.create({
-          trigger: w, start: 'top bottom', end: 'top top', scrub: true,
-          onUpdate: function (self) {
-            plate.style.setProperty('--enter', self.progress.toFixed(4));
-            if (prev) prev.style.setProperty('--exit', self.progress.toFixed(4));
-          }
-        }));
-        plateTriggers.push(ScrollTrigger.create({
-          trigger: w, start: 'top top', end: 'bottom bottom', scrub: true,
-          onUpdate: function (self) {
-            var s = self.progress;
-            plate.style.setProperty('--stay', s.toFixed(4));
-            flips.forEach(function (f) {
-              var k = parseFloat(f.style.getPropertyValue('--k') || getComputedStyle(f).getPropertyValue('--k')) || 0;
-              f.style.setProperty('--flip', clamp(s * 2.4 - k * 0.5, 0, 1).toFixed(4));
-            });
-          }
-        }));
-      } else {
-        plateTriggers.push(ScrollTrigger.create({
-          trigger: plate, start: 'top bottom', end: 'top 55%', scrub: true,
-          onUpdate: function (self) { plate.style.setProperty('--enter', self.progress.toFixed(4)); }
-        }));
-        flips.forEach(function (f) {
-          plateTriggers.push(ScrollTrigger.create({
-            trigger: f, start: 'top 88%', end: 'top 42%', scrub: true,
-            onUpdate: function (self) { f.style.setProperty('--flip', self.progress.toFixed(4)); }
-          }));
-        });
+    plates.forEach(function (plate, idx) {
+      var isHero = plate === hero;
+      if (!plate.querySelector(':scope > .plate-shade')) {
+        var sh = document.createElement('i'); sh.className = 'plate-shade'; sh.setAttribute('aria-hidden', 'true'); plate.appendChild(sh);
       }
+      var shade = plate.querySelector(':scope > .plate-shade');
+      var next = plates[idx + 1];
+
+      /* уход: плита чуть отъезжает вглубь и темнеет, пока следующая поднимается */
+      if (next && !mobile) {
+        addST(gsap.fromTo(plate, { scale: 1 }, { scale: .955, ease: 'none', immediateRender: false,
+          scrollTrigger: { trigger: plate, start: 'bottom 85%', end: 'bottom top', scrub: true } }));
+        addST(gsap.fromTo(shade, { opacity: 0 }, { opacity: .55, ease: 'none', immediateRender: false,
+          scrollTrigger: { trigger: plate, start: 'bottom 85%', end: 'bottom top', scrub: true } }));
+      }
+      if (isHero) return;
+
+      /* приход: плита «откидывается» на петле верхнего края */
+      addST(gsap.fromTo(plate, { rotateX: mobile ? -8 : -14, transformPerspective: 1400 }, { rotateX: 0, ease: 'none',
+        scrollTrigger: { trigger: plate, start: 'top bottom', end: mobile ? 'top 55%' : 'top 25%', scrub: true } }));
+
+      var txt = plate.querySelector('.plate-text');
+      if (txt) addST(gsap.fromTo(txt, { y: 48, opacity: 0 }, { y: 0, opacity: 1, ease: 'none',
+        scrollTrigger: { trigger: plate, start: 'top 90%', end: mobile ? 'top 40%' : 'top 20%', scrub: true } }));
+      var ph = plate.querySelector('.service-photos');
+      if (ph) addST(gsap.fromTo(ph, { y: 60, opacity: 0 }, { y: 0, opacity: 1, ease: 'none',
+        scrollTrigger: { trigger: ph, start: 'top 95%', end: 'top 45%', scrub: true } }));
+
+      /* тихий фон и фото - параллакс за весь проход плиты */
+      var bg = plate.querySelector('.plate-bg svg');
+      if (bg && !mobile) {
+        var from = { y: 40 }, to = { y: -40 };
+        if (plate.querySelector('.bg-rings')) { from = { scale: 1 }; to = { scale: 1.08 }; }
+        addST(gsap.fromTo(bg, from, Object.assign(to, { ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } })));
+      }
+      var sp1 = plate.querySelector('.sp1'), sp2 = plate.querySelector('.sp2');
+      if (sp1) addST(gsap.fromTo(sp1, { rotation: -2.4, y: 26 }, { rotation: -2.4, y: -26, ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } }));
+      if (sp2) addST(gsap.fromTo(sp2, { rotation: 2, y: -22 }, { rotation: 2, y: 22, ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } }));
     });
 
-    /* карточки плиты «прокурор» переворачиваются и по касанию */
-    Array.prototype.forEach.call(document.querySelectorAll('.tp'), function (tp) {
-      tp.addEventListener('click', function () {
-        var cur = parseFloat(tp.style.getPropertyValue('--flip')) || 0;
-        tp.style.setProperty('--flip', cur > 0.5 ? '0' : '1');
-      });
+    /* таблички переворачиваются, когда въезжают в кадр (по времени, не держат прокрутку) */
+    Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) {
+      var inner = f.querySelector('.dp-in, .tp-in');
+      if (!inner) return;
+      var k = parseFloat(f.style.getPropertyValue('--k')) || 0;
+      addST(ScrollTrigger.create({
+        trigger: f, start: mobile ? 'top 70%' : 'top 62%',
+        onEnter: function () { flipTo(inner, true, 0.15 + k * 0.18); },
+        onLeaveBack: function () { flipTo(inner, false, 0); }
+      }));
     });
   }
+  /* карточки плиты «прокурор» переворачиваются и по касанию */
+  Array.prototype.forEach.call(document.querySelectorAll('.tp'), function (tp) {
+    tp.addEventListener('click', function () {
+      var inner = tp.querySelector('.tp-in');
+      if (!hasGsap || reduce) { var cur = parseFloat(tp.style.getPropertyValue('--flip')) || 0; tp.style.setProperty('--flip', cur > 0.5 ? '0' : '1'); return; }
+      flipTo(inner, (gsap.getProperty(inner, 'rotateX') || 0) > -90, 0);
+    });
+  });
 
   /* ---------- Линия шагов ---------- */
   function setupSteps() {

@@ -109,9 +109,9 @@ h1,h2,h3{margin:0;font-weight:700}
 
 /* Герой */
 .pw{position:relative}
-.pw-hero{height:230svh}
+.pw-hero{height:auto}
 .hero{
-  position:sticky;top:0;height:100svh;overflow:hidden;background:var(--graphite);
+  position:relative;height:100svh;overflow:hidden;background:var(--graphite);
   --pan:-1;
 }
 .scene{position:absolute;inset:0;overflow:hidden}
@@ -128,20 +128,11 @@ h1,h2,h3{margin:0;font-weight:700}
     linear-gradient(90deg,rgba(15,18,21,.9) 0%,rgba(15,18,21,.66) 34%,rgba(15,18,21,.12) 58%,rgba(15,18,21,.08) 100%),
     linear-gradient(180deg,rgba(15,18,21,.55) 0%,rgba(15,18,21,0) 30%,rgba(15,18,21,0) 70%,rgba(15,18,21,.75) 100%);
 }
-.spot{transform:translateX(calc((var(--pan) + 1) * 455px))}
-.lbl-pro{opacity:calc(.6 - var(--pan) * .38)}
-.lbl-def{opacity:calc(.6 + var(--pan) * .38)}
-.ray{transform-origin:50% 0;animation:rayBreath 9s var(--ease) infinite alternate}
-.ray.r2{animation-delay:-3s}.ray.r3{animation-delay:-5s}.ray.r4{animation-delay:-7s}
-@keyframes rayBreath{from{opacity:.55}to{opacity:1}}
-.emblem{animation:emblemGlow 7s ease-in-out infinite alternate}
-@keyframes emblemGlow{from{opacity:.6}to{opacity:1}}
-.dust circle{opacity:.22;animation:dust 14s ease-in-out infinite alternate}
-.dust circle:nth-child(2n){animation-duration:17s;animation-delay:-6s}
-.dust circle:nth-child(3n){animation-duration:21s;animation-delay:-11s}
-.dust circle:nth-child(5n){animation-duration:12s;animation-delay:-3s}
-@keyframes dust{from{transform:translate(0,0);opacity:.1}50%{opacity:.4}to{transform:translate(18px,-46px);opacity:.12}}
-.hero.is-off .ray,.hero.is-off .emblem,.hero.is-off .dust circle{animation-play-state:paused}
+.lbl-pro{opacity:.98}
+.lbl-def{opacity:.22}
+.ray{opacity:.8}
+.emblem{opacity:.85}
+.dust circle{opacity:.22}
 
 .hero-in{
   position:relative;z-index:2;height:100%;max-width:var(--wrap);margin:0 auto;padding:calc(var(--hdr) + 28px) var(--pad) 48px;
@@ -191,32 +182,28 @@ h1,h2,h3{margin:0;font-weight:700}
 .portrait-cap::before{content:"";width:6px;height:6px;background:var(--blue)}
 
 .scroll-hint{position:absolute;left:50%;bottom:22px;z-index:3;width:1px;height:56px;transform:translateX(-50%);background:rgba(141,176,214,.2);overflow:hidden}
-.scroll-line{position:absolute;left:0;top:-100%;width:100%;height:100%;background:var(--blue);animation:scrollLine 2.2s var(--ease) infinite}
-@keyframes scrollLine{to{top:100%}}
+.scroll-line{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--blue);transform:translateY(-100%);animation:scrollLine 2.2s var(--ease) infinite}
+@keyframes scrollLine{to{transform:translateY(100%)}}
 
 /* Плиты */
-.pw[data-plate]{height:170svh}
+.pw[data-plate]{height:auto}
 .plate{
-  position:sticky;top:0;height:100svh;overflow:hidden;
-  --enter:1;--stay:0;--exit:0;
+  position:relative;height:100svh;min-height:640px;overflow:hidden;
   transform-origin:50% 0;
-  transform:perspective(1400px) rotateX(calc((1 - var(--enter)) * -20deg)) scale(calc(1 - var(--exit) * .06));
-  border-top-left-radius:calc((1 - var(--enter)) * 32px + var(--exit) * 22px);
-  border-top-right-radius:calc((1 - var(--enter)) * 32px + var(--exit) * 22px);
   will-change:transform;
 }
-.plate::after{content:"";position:absolute;inset:0;background:var(--graphite);opacity:calc(var(--exit) * .72);pointer-events:none;z-index:5}
+.plate-shade{position:absolute;inset:0;background:#0F1215;opacity:0;pointer-events:none;z-index:5;will-change:opacity}
 .plate-dark{background:var(--graphite)}
 .plate-steel{background:var(--steel)}
 .plate-bg{position:absolute;inset:0;pointer-events:none}
 .plate-bg svg{position:absolute;inset:0;width:100%;height:100%}
 .bg-emblem svg{left:auto;right:-10%;top:-10%;width:70%;height:120%}
-.bg-steps svg{transform:translateY(calc(var(--stay) * -40px))}
-.bg-rings svg{transform:scale(calc(1 + var(--stay) * .08));transform-origin:78% 50%}
+.plate-bg svg{will-change:transform}
+.bg-rings svg{transform-origin:78% 50%}
 .plate .wrap{position:relative;z-index:2;height:100%}
 .plate-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,80px);align-items:center;height:100%;padding-top:var(--hdr)}
 .plate-grid-rev .plate-text{order:2}
-.plate-text{transform:translate3d(0,calc((1 - var(--enter)) * 48px),0);opacity:calc(var(--enter) * 1.3 - .3)}
+.plate-text{will-change:transform,opacity}
 .plate .lead{margin-bottom:26px}
 .fact-line{font-size:14px;color:var(--blue);padding:12px 0 0 16px;border-left:2px solid var(--blue);margin:-6px 0 26px;max-width:560px}
 .fact-line{padding-top:0}
@@ -271,11 +258,11 @@ h1,h2,h3{margin:0;font-weight:700}
 .tp-title{font-family:var(--fd);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:clamp(17px,1.3vw,21px);line-height:1.1;color:var(--ice);text-shadow:0 1px 0 rgba(255,255,255,.14),0 -1px 1px rgba(0,0,0,.7)}
 .tp-back{transform:rotateX(180deg);background:linear-gradient(165deg,#2b333d,#1c2229 60%,#232b33);font-size:14px;line-height:1.4;color:var(--txt-2);display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 18px}
 .tp-back strong{color:var(--ice);font-weight:600;font-size:14.5px}
-.service-photos{position:relative;margin:0;height:min(580px,68svh);transform:translate3d(0,calc((1 - var(--enter)) * 60px),0);opacity:calc(var(--enter) * 1.2 - .2)}
+.service-photos{position:relative;margin:0;height:min(580px,68svh)}
 .sp{position:absolute;background:#2a323b;padding:10px;border:1px solid rgba(141,176,214,.45);box-shadow:0 40px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.1)}
 .sp img{width:100%;height:auto;filter:saturate(.75) contrast(1.05)}
-.sp1{left:0;top:4%;width:60%;transform:rotate(-2.4deg) translateY(calc(var(--stay) * -26px))}
-.sp2{right:0;bottom:11%;width:58%;transform:rotate(2deg) translateY(calc(var(--stay) * 22px));z-index:2}
+.sp1{left:0;top:4%;width:60%;transform:rotate(-2.4deg)}
+.sp2{right:0;bottom:11%;width:58%;transform:rotate(2deg);z-index:2}
 .sp-cap{position:absolute;left:0;bottom:0;font-size:12.5px;letter-spacing:.04em;color:var(--txt-2);display:flex;align-items:center;gap:10px}
 .sp-cap::before{content:"";width:6px;height:6px;background:var(--blue)}
 
@@ -293,6 +280,52 @@ h1,h2,h3{margin:0;font-weight:700}
 .sec-steel{background:var(--steel);color:var(--txt)}
 .sec-dark{background:var(--graphite);color:var(--txt)}
 .sec-steel::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 50% at 0% 100%,rgba(141,176,214,.12),transparent 60%)}
+
+
+/* ===== Чередование тем: тёмный - светлый по всей странице =====
+   Светлые плиты (бывшие тёмные): фон ice, текст графитом; металлические таблички остаются тёмными - это предмет на светлой стене.
+   Тёмные секции (бывшие светлые): те же переменные с обратными значениями. */
+.plate-light{background:var(--ice);color:var(--ink);--txt:#0F1215;--txt-2:#4A5560;--line:rgba(15,18,21,.2)}
+.plate-light::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(15,18,21,.035) 0 1px,transparent 1px 160px),radial-gradient(120% 60% at 100% 0%,rgba(141,176,214,.24),transparent 60%)}
+.plate-light .h2{color:var(--ink)}
+.plate-light .kicker{color:var(--blue-d)}
+.plate-light .lead{color:var(--ink-2)}
+.plate-light .fact-line{color:var(--blue-d);border-left-color:var(--blue-d)}
+.plate-light .plate-bg g{stroke:#3E6189;stroke-opacity:.22}
+.plate-light .btn-white{background:var(--ink);color:var(--white)}
+.plate-light .btn-white:hover{background:#1c2128}
+.plate-light .btn-wa{background:rgba(15,18,21,.05);color:var(--ink);border-color:rgba(15,18,21,.22)}
+.plate-light .sp{background:#fff;border-color:rgba(15,18,21,.14);box-shadow:0 40px 70px -34px rgba(15,18,21,.45)}
+.plate-light .dp,.plate-light .tp{--txt:#E8EDF3;--txt-2:#B8C3CF;--line:rgba(141,176,214,.32)}
+.plate-light .dp-face,.plate-light .tp-face{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.6),0 40px 70px -34px rgba(15,18,21,.55)}
+
+.sec-ice.sec-inv{background:var(--graphite);
+  --ink:#E8EDF3;--ink-2:#B8C3CF;--line-ink:rgba(232,237,243,.16);--blue-d:#8DB0D6;--ice-2:#1C2128;color:var(--ink)}
+.sec-ice.sec-inv::before{background:repeating-linear-gradient(90deg,rgba(232,237,243,.03) 0 1px,transparent 1px 160px),radial-gradient(120% 60% at 100% 0%,rgba(141,176,214,.12),transparent 60%)}
+.sec-inv .btn-dark{background:var(--white);color:#0F1215}
+.sec-inv .btn-dark:hover{background:#dfe6ee}
+.sec-inv .rbtn:hover{color:#0F1215}
+.sec-inv .rev{border-color:rgba(141,176,214,.22);box-shadow:none}
+.sec-inv .form{border-color:rgba(141,176,214,.22);box-shadow:0 30px 60px -40px rgba(0,0,0,.8)}
+.sec-inv .fld input,.sec-inv .fld textarea{border-bottom-color:rgba(232,237,243,.35)}
+.sec-inv .fld input::placeholder,.sec-inv .fld textarea::placeholder{color:rgba(232,237,243,.4)}
+.sec-inv .kt-bc img{border-color:rgba(232,237,243,.18);background:#fff}
+.sec-inv .steps-line{background:rgba(232,237,243,.16)}
+
+/* «Об адвокате» - светлая */
+.sec-ice .facts{border-top-color:var(--line-ink)}
+.sec-ice .facts dt{color:var(--ink)}
+.sec-ice .facts dt span:not(.num),.sec-ice .ab-who-h{color:var(--blue-d)}
+.sec-ice .facts dd{color:var(--ink-2)}
+.sec-ice .chips li{border-color:rgba(15,18,21,.2);color:var(--ink)}
+.sec-ice .portrait-frame{border-color:rgba(15,18,21,.18)}
+
+/* подвал - светлый после тёмных контактов */
+.foot.foot-light{background:var(--ice);color:var(--ink-2);border-top-color:rgba(15,18,21,.1)}
+.foot-light .foot-nav a:hover{color:var(--ink)}
+.foot-light .brand-name{color:var(--ink)}
+.foot-light .brand-sub{color:var(--blue-d)}
 
 /* Срочное обращение */
 .sr-grid{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:clamp(32px,5vw,80px);align-items:center}
@@ -477,10 +510,10 @@ h1,h2,h3{margin:0;font-weight:700}
   .scroll-hint{display:none}
 
   .pw[data-plate]{height:auto}
-  .plate{position:relative;height:auto;min-height:100svh;transform:perspective(1400px) rotateX(calc((1 - var(--enter)) * -14deg));border-radius:0}
-  .plate::after{display:none}
+  .plate{position:relative;height:auto;min-height:100svh}
+  .plate-shade{display:none}
   .plate .wrap{height:auto}
-  .plate-grid{grid-template-columns:1fr;gap:36px;height:auto;padding:calc(var(--hdr) + 32px) 0 64px}
+  .plate-grid{grid-template-columns:1fr;gap:36px;height:auto;padding:calc(var(--hdr) + 32px) var(--pad) 64px}
   .plate-grid-rev .plate-text{order:0}
   .dp{height:380px}
   .dp-tall{height:620px}
