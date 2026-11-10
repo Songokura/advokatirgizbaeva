@@ -125,7 +125,7 @@ h1,h2,h3{margin:0;font-weight:700}
 .ly-haze2{background:linear-gradient(180deg,rgba(15,18,21,0) 58%,rgba(15,18,21,.38) 74%,rgba(15,18,21,.1) 100%)}
 .ly-vignette{
   background:
-    linear-gradient(90deg,rgba(15,18,21,.9) 0%,rgba(15,18,21,.66) 34%,rgba(15,18,21,.12) 58%,rgba(15,18,21,.08) 100%),
+    linear-gradient(90deg,rgba(15,18,21,.92) 0%,rgba(15,18,21,.82) 42%,rgba(15,18,21,.2) 64%,rgba(15,18,21,.08) 100%),
     linear-gradient(180deg,rgba(15,18,21,.55) 0%,rgba(15,18,21,0) 30%,rgba(15,18,21,0) 70%,rgba(15,18,21,.75) 100%);
 }
 .lbl-pro{opacity:.98}
@@ -135,8 +135,8 @@ h1,h2,h3{margin:0;font-weight:700}
 .dust circle{opacity:.22}
 
 .hero-in{
-  position:relative;z-index:2;height:100%;max-width:var(--wrap);margin:0 auto;padding:calc(var(--hdr) + 28px) var(--pad) 48px;
-  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);grid-template-rows:auto auto 1fr;
+  position:relative;z-index:2;height:100%;max-width:var(--wrap);margin:0 auto;padding:calc(var(--hdr) + 24px) var(--pad) 64px;
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);grid-template-rows:auto auto auto;
   grid-template-areas:"kicker portrait" "np portrait" "text portrait";column-gap:clamp(24px,4vw,72px);align-content:center;
 }
 .hero-kicker{grid-area:kicker;align-self:end}
@@ -168,9 +168,10 @@ h1,h2,h3{margin:0;font-weight:700}
 .hero .lead{color:#C9D3DE;font-size:clamp(15.5px,1.15vw,17.5px);max-width:720px}
 
 /* Портрет */
-.portrait{grid-area:portrait;justify-self:end;align-self:end;margin:0;width:min(100%,420px);transform:translate3d(calc(var(--pan) * -22px),0,0)}
+.portrait{grid-area:portrait;grid-row:1/-1;justify-self:end;align-self:stretch;display:flex;flex-direction:column;margin:0;width:min(100%,440px)}
 .portrait-frame{position:relative;overflow:hidden;background:#11161b;border:1px solid rgba(141,176,214,.5)}
-.portrait .portrait-frame{aspect-ratio:902/1504;max-height:calc(100svh - var(--hdr) - 110px)}
+.portrait .portrait-frame{flex:1 1 auto;min-height:0}
+.portrait .portrait-frame img{position:absolute;inset:0;object-position:50% 88%}
 .portrait-frame img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .portrait-frame::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),inset 0 -80px 120px -60px rgba(15,18,21,.75);pointer-events:none}
 .corner{position:absolute;width:16px;height:16px;border:1px solid var(--blue);pointer-events:none}
@@ -470,7 +471,7 @@ h1,h2,h3{margin:0;font-weight:700}
 .sticky-bar{display:none}
 
 /* Проявление */
-.rv{opacity:0;transform:translate3d(0,20px,0);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+.rv{opacity:0;transform:translate3d(0,28px,0);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .rv.is-in{opacity:1;transform:none}
 .hero .rv{transition-duration:1.2s}
 
@@ -503,8 +504,9 @@ h1,h2,h3{margin:0;font-weight:700}
   .hero .lead{font-size:15.5px;margin-bottom:22px}
   .hero-cta .btn{flex:1 1 160px}
   .hero-note{margin-bottom:28px}
-  .portrait{justify-self:stretch;width:100%;transform:none}
-  .portrait .portrait-frame{aspect-ratio:3/4;max-height:62svh}
+  .portrait{grid-row:auto;justify-self:stretch;width:100%;transform:none}
+  .portrait .portrait-frame{flex:none;aspect-ratio:3/4;max-height:62svh}
+  .portrait .portrait-frame img{object-position:50% 70%}
   .portrait-cap{display:none}
   .np{width:100%;height:64px;margin:0 0 20px;z-index:3}
   .np-face{padding:0 18px;gap:14px}

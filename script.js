@@ -96,31 +96,6 @@
     window.open('https://wa.me/77782580086?text=' + encodeURIComponent(text), '_blank', 'noopener');
   });
 
-  /* ---------- Проявление блоков ---------- */
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-    });
-  }, { threshold: 0, rootMargin: '0px 0px -4% 0px' });
-  Array.prototype.forEach.call(document.querySelectorAll('.rv:not(.hero .rv)'), function (el) { io.observe(el); });
-
-  /* ---------- Заголовки: строки выезжают ---------- */
-  function splitHeads() {
-    if (!hasGsap || typeof SplitText === 'undefined' || reduce) {
-      Array.prototype.forEach.call(document.querySelectorAll('.split'), function (h) { h.classList.add('is-in'); });
-      return;
-    }
-    Array.prototype.forEach.call(document.querySelectorAll('.split:not(.h1)'), function (h) {
-      var sp = new SplitText(h, { type: 'lines', linesClass: 'ln' });
-      var inner = sp.lines.map(function (l) { var s = document.createElement('span'); s.innerHTML = l.innerHTML; l.innerHTML = ''; l.appendChild(s); return s; });
-      gsap.set(inner, { yPercent: 108 });
-      ScrollTrigger.create({
-        trigger: h, start: 'top 96%', once: true,
-        onEnter: function () { gsap.to(inner, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out' }); }
-      });
-    });
-  }
-
   /* ---------- Герой: интро и камера ---------- */
   var hero = document.getElementById('hero');
   var heroWrap = document.getElementById('heroWrap');
@@ -161,7 +136,7 @@
     var spot = hero.querySelector('.spot'); if (spot) gsap.set(spot, { x: (pan + 1) * 455 });
     var lp = hero.querySelector('.lbl-pro'), ld = hero.querySelector('.lbl-def');
     if (lp) gsap.set(lp, { opacity: .6 - pan * .38 }); if (ld) gsap.set(ld, { opacity: .6 + pan * .38 });
-    var pr = hero.querySelector('.portrait'); if (pr) gsap.set(pr, { x: pan * -22 });
+    var pr = hero.querySelector('.portrait-frame'); if (pr) gsap.set(pr, { x: (pan + 1) * -11 });
   }
   function setupHeroPan() {
     if (heroTl) { heroTl.scrollTrigger && heroTl.scrollTrigger.kill(); heroTl.kill(); heroTl = null; }
@@ -175,79 +150,95 @@
     var lp = hero.querySelector('.lbl-pro'), ld = hero.querySelector('.lbl-def');
     if (lp) heroTl.to(lp, { opacity: .22, duration: D, ease: E }, 0);
     if (ld) heroTl.to(ld, { opacity: .98, duration: D, ease: E }, 0);
-    var pr = hero.querySelector('.portrait'); if (pr) heroTl.to(pr, { x: -22, duration: D, ease: E }, 0);
+    var pr = hero.querySelector('.portrait-frame'); if (pr) heroTl.to(pr, { x: -22, duration: D, ease: E }, 0);
     var hin = hero.querySelector('.hero-in'); if (hin) heroTl.to(hin, { y: -80, opacity: .35, duration: 1 }, 0);
   }
 
   /* пауза анимаций сцены вне экрана */
   new IntersectionObserver(function (en) { hero.classList.toggle('is-off', !en[0].isIntersecting); }, { threshold: 0 }).observe(hero);
 
-  /* ---------- Плиты: эффекты идут на ходу прокрутки, плиты не залипают ----------
-     Всё анимируется transform/opacity напрямую (без CSS-переменных на всё дерево). */
-  var plateTriggers = [];
-  function addST(t) { plateTriggers.push(t.scrollTrigger || t); return t; }
+  /* ---------- Сцены секций (всё, кроме героя) ----------
+     Секция ждёт в начальном положении и проигрывает свою анимацию целиком, по времени и плавно,
+     когда оказывается в середине экрана. Прокрутку ничто не держит, к позиции скролла анимация не привязана. */
   function flipTo(inner, on, delay) {
-    gsap.to(inner, { rotateX: on ? -180 : 0, duration: 0.6, delay: delay || 0, ease: 'power3.inOut', overwrite: 'auto' });
+    gsap.to(inner, { rotateX: on ? -180 : 0, duration: 0.8, delay: delay || 0, ease: 'power3.inOut', overwrite: 'auto' });
   }
-  function setupPlates() {
-    plateTriggers.forEach(function (t) { t.kill(); });
-    plateTriggers = [];
-    var flipsAll = document.querySelectorAll('.dp-in, .tp-in');
-    if (!hasGsap || reduce) {
-      Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) { f.style.setProperty('--flip', '1'); });
-      return;
-    }
-    gsap.set(flipsAll, { rotateX: 0 });
-    var mobile = isMobile();
-    var plates = Array.prototype.slice.call(document.querySelectorAll('.plate'));
+  function runCounter(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10), t0 = null, dur = 1600;
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  function splitLines(h) {
+    var sp = new SplitText(h, { type: 'lines', linesClass: 'ln' });
+    return sp.lines.map(function (l) { var s = document.createElement('span'); s.innerHTML = l.innerHTML; l.innerHTML = ''; l.appendChild(s); return s; });
+  }
+  function showAllStatic() {
+    Array.prototype.forEach.call(document.querySelectorAll('.rv'), function (el) { el.classList.add('is-in'); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) { f.style.setProperty('--flip', '1'); });
+    var st = document.querySelector('.steps'); if (st) st.style.setProperty('--draw', '1');
+  }
+  function setupScenes() {
+    if (!hasGsap || reduce) { showAllStatic(); return; }
+    var sections = Array.prototype.slice.call(document.querySelectorAll('main section')).filter(function (s) { return s !== hero; });
+    sections.forEach(function (sec) {
+      var tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out', duration: 1 } });
+      var q = function (sel) { return Array.prototype.slice.call(sec.querySelectorAll(sel)); };
 
-    plates.forEach(function (plate, idx) {
-      var isHero = plate === hero;
-      if (!plate.querySelector(':scope > .plate-shade')) {
-        var sh = document.createElement('i'); sh.className = 'plate-shade'; sh.setAttribute('aria-hidden', 'true'); plate.appendChild(sh);
-      }
-      var shade = plate.querySelector(':scope > .plate-shade');
-      var next = plates[idx + 1];
+      /* фон плиты проявляется и «садится» */
+      var bg = sec.querySelector('.plate-bg svg');
+      if (bg) tl.fromTo(bg, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 1.6, ease: 'power2.out' }, 0);
 
-      /* уход: плита чуть отъезжает вглубь и темнеет, пока следующая поднимается */
-      if (next && !mobile) {
-        addST(gsap.fromTo(plate, { scale: 1 }, { scale: .955, ease: 'none', immediateRender: false,
-          scrollTrigger: { trigger: plate, start: 'bottom 85%', end: 'bottom top', scrub: true } }));
-        addST(gsap.fromTo(shade, { opacity: 0 }, { opacity: .55, ease: 'none', immediateRender: false,
-          scrollTrigger: { trigger: plate, start: 'bottom 85%', end: 'bottom top', scrub: true } }));
-      }
-      if (isHero) return;
+      /* текст плиты: кикер, заголовок, лид, кнопка - лесенкой */
+      var ptxt = q('.plate-text > *:not(.tp-row)');
+      if (ptxt.length) tl.fromTo(ptxt, { opacity: 0, y: 34 }, { opacity: 1, y: 0, stagger: 0.09 }, 0.05);
+      var tps = q('.tp');
+      if (tps.length) tl.fromTo(tps, { opacity: 0, y: 24 }, { opacity: 1, y: 0, stagger: 0.09, duration: 0.8 }, 0.35);
 
-      /* приход: плита «откидывается» на петле верхнего края */
-      addST(gsap.fromTo(plate, { rotateX: mobile ? -8 : -14, transformPerspective: 1400 }, { rotateX: 0, ease: 'none',
-        scrollTrigger: { trigger: plate, start: 'top bottom', end: mobile ? 'top 60%' : 'top 40%', scrub: true } }));
+      /* заголовки секций: строки выезжают из-под маски */
+      q('.split:not(.h1)').forEach(function (h) {
+        if (typeof SplitText === 'undefined') return;
+        var lines = splitLines(h);
+        tl.fromTo(lines, { yPercent: 108 }, { yPercent: 0, stagger: 0.08, duration: 1.05 }, 0.05);
+      });
+      var kick = q('.sec-head .kicker, .rev-head .kicker, .ab-text > .kicker');
+      if (kick.length) tl.fromTo(kick, { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.8 }, 0);
 
-      var txt = plate.querySelector('.plate-text');
-      if (txt) addST(gsap.fromTo(txt, { y: 48, opacity: 0 }, { y: 0, opacity: 1, ease: 'none',
-        scrollTrigger: { trigger: plate, start: 'top bottom', end: mobile ? 'top 60%' : 'top 45%', scrub: true } }));
-      var ph = plate.querySelector('.service-photos');
-      if (ph) addST(gsap.fromTo(ph, { y: 60, opacity: 0 }, { y: 0, opacity: 1, ease: 'none',
-        scrollTrigger: { trigger: ph, start: 'top bottom', end: 'top 60%', scrub: true } }));
+      /* блоки .rv - по очереди, через CSS-переход */
+      q('.rv').forEach(function (el, i) { tl.call(function () { el.classList.add('is-in'); }, null, 0.25 + i * 0.09); });
 
-      /* тихий фон и фото - параллакс за весь проход плиты */
-      var bg = plate.querySelector('.plate-bg svg');
-      if (bg && !mobile) {
-        var from = { y: 40 }, to = { y: -40 };
-        if (plate.querySelector('.bg-rings')) { from = { scale: 1 }; to = { scale: 1.08 }; }
-        addST(gsap.fromTo(bg, from, Object.assign(to, { ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } })));
-      }
-      var sp1 = plate.querySelector('.sp1'), sp2 = plate.querySelector('.sp2');
-      if (sp1) addST(gsap.fromTo(sp1, { rotation: -2.4, y: 26 }, { rotation: -2.4, y: -26, ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } }));
-      if (sp2) addST(gsap.fromTo(sp2, { rotation: 2, y: -22 }, { rotation: 2, y: 22, ease: 'none', scrollTrigger: { trigger: plate, start: 'top bottom', end: 'bottom top', scrub: true } }));
-    });
+      /* фото службы: карточки «ложатся» на стол */
+      var sp1 = sec.querySelector('.sp1'), sp2 = sec.querySelector('.sp2'), cap = sec.querySelector('.sp-cap');
+      if (sp1) tl.fromTo(sp1, { opacity: 0, y: 70, rotation: -9 }, { opacity: 1, y: 0, rotation: -2.4, duration: 1.2 }, 0.2);
+      if (sp2) tl.fromTo(sp2, { opacity: 0, y: 90, rotation: 8 }, { opacity: 1, y: 0, rotation: 2, duration: 1.2 }, 0.38);
+      if (cap) tl.fromTo(cap, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 1);
 
-    /* таблички переворачиваются строго по прокрутке: доворот закончен, когда табличка в верхней половине экрана */
-    Array.prototype.forEach.call(document.querySelectorAll('[data-flip]'), function (f) {
-      var inner = f.querySelector('.dp-in, .tp-in');
-      if (!inner) return;
-      var k = parseFloat(f.style.getPropertyValue('--k')) || 0;
-      addST(gsap.fromTo(inner, { rotateX: 0 }, { rotateX: -180, ease: 'power1.inOut', immediateRender: false,
-        scrollTrigger: { trigger: f, start: 'top ' + (88 - k * 4) + '%', end: 'top ' + (55 - k * 4) + '%', scrub: true } }));
+      /* таблички переворачиваются ПРОКУРОР-сторона -> список */
+      q('[data-flip]').forEach(function (f) {
+        var inner = f.querySelector('.dp-in, .tp-in'); if (!inner) return;
+        var k = parseFloat(f.style.getPropertyValue('--k')) || 0;
+        if (f.classList.contains('dp')) tl.fromTo(f, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9 }, 0.1);
+        tl.fromTo(inner, { rotateX: 0 }, { rotateX: -180, duration: 1.15, ease: 'power3.inOut' }, 0.7 + k * 0.18);
+      });
+
+      /* линия шагов */
+      var steps = sec.querySelector('.steps');
+      if (steps) { var pr = { d: 0 }; steps.style.setProperty('--draw', '0');
+        tl.to(pr, { d: 1, duration: 1.4, ease: 'power2.inOut', onUpdate: function () { steps.style.setProperty('--draw', pr.d.toFixed(4)); } }, 0.2); }
+
+      /* счётчики */
+      q('.num[data-count]').forEach(function (n) { n.textContent = '0'; tl.call(function () { runCounter(n); }, null, 0.4); });
+
+      if (!tl.getChildren().length) return;
+      ScrollTrigger.create({
+        trigger: sec, once: true,
+        /* «середина страницы»: центр секции у середины экрана; высокая секция - когда заполнила экран */
+        start: function () { return sec.offsetHeight > window.innerHeight * 1.05 ? 'top 15%' : 'center 65%'; },
+        onEnter: function () { tl.play(); }
+      });
     });
   }
   /* карточки плиты «прокурор» переворачиваются и по касанию */
@@ -259,38 +250,12 @@
     });
   });
 
-  /* ---------- Линия шагов ---------- */
-  function setupSteps() {
-    var steps = document.querySelector('.steps');
-    if (!steps) return;
-    if (!hasGsap) { steps.style.setProperty('--draw', '1'); return; }
-    ScrollTrigger.create({
-      trigger: steps, start: 'top 90%', end: 'top 45%', scrub: true,
-      onUpdate: function (self) { steps.style.setProperty('--draw', self.progress.toFixed(4)); }
-    });
-  }
-
-  /* ---------- Счётчики ---------- */
-  function setupCounters() {
-    var nums = document.querySelectorAll('.num[data-count]');
-    if (!nums.length) return;
-    var cio = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        cio.unobserve(en.target);
-        var el = en.target, target = parseInt(el.getAttribute('data-count'), 10);
-        if (reduce) { el.textContent = target; return; }
-        var t0 = null, dur = 900;
-        (function tick(ts) {
-          if (!t0) t0 = ts;
-          var p = Math.min(1, (ts - t0) / dur);
-          var e = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(target * e);
-          if (p < 1) requestAnimationFrame(tick);
-        })(performance.now());
-      });
-    }, { threshold: 0.5 });
-    Array.prototype.forEach.call(nums, function (n) { cio.observe(n); });
+  /* ---------- Герой уходит: отъезжает вглубь и темнеет (только герой привязан к прокрутке) ---------- */
+  function setupHeroExit() {
+    if (!hasGsap || reduce || isMobile()) return;
+    var sh = document.createElement('i'); sh.className = 'plate-shade'; sh.setAttribute('aria-hidden', 'true'); hero.appendChild(sh);
+    gsap.fromTo(hero, { scale: 1 }, { scale: .955, ease: 'none', immediateRender: false, scrollTrigger: { trigger: hero, start: 'bottom 85%', end: 'bottom top', scrub: true } });
+    gsap.fromTo(sh, { opacity: 0 }, { opacity: .55, ease: 'none', immediateRender: false, scrollTrigger: { trigger: hero, start: 'bottom 85%', end: 'bottom top', scrub: true } });
   }
 
   /* ---------- Циферблат 24/7 ---------- */
@@ -390,11 +355,9 @@
   /* ---------- Старт ---------- */
   function init() {
     heroIntro();
-    splitHeads();
     setupHeroPan();
-    setupPlates();
-    setupSteps();
-    setupCounters();
+    setupHeroExit();
+    setupScenes();
     if (hasGsap) {
       ScrollTrigger.refresh();
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
@@ -406,7 +369,7 @@
   window.addEventListener('resize', function () {
     clearTimeout(rT);
     rT = setTimeout(function () {
-      if (isMobile() !== lastMobile) { lastMobile = isMobile(); setupHeroPan(); setupPlates(); }
+      if (isMobile() !== lastMobile) { lastMobile = isMobile(); setupHeroPan(); }
       if (hasGsap) ScrollTrigger.refresh();
     }, 150);
   });
