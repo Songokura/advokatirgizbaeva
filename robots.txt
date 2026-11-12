@@ -7,4 +7,4 @@ User-agent: AdsBot-Google-Mobile
 Disallow: /assets/lang/
 Disallow: /*lang=kk
 
-Sitemap: https://songokura.github.io/advokatirgizbaeva/sitemap.xml
+Sitemap: https://advokat-irgizbaeva.kz/sitemap.xml
