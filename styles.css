@@ -568,3 +568,7 @@ h1,h2,h3{margin:0;font-weight:700}
   .plate{transform:none!important}
   .plate-text,.service-photos{transform:none!important;opacity:1!important}
 }
+.step-cases{display:grid;gap:12px;margin-top:4px}
+.step-cases li{display:grid;gap:2px;font-size:15px;line-height:1.45;color:var(--ink-2)}
+.step-cases b{font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-d)}
+.step-tail{margin-top:14px;font-weight:500}
