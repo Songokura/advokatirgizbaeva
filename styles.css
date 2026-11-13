@@ -579,7 +579,9 @@ h1,h2,h3{margin:0;font-weight:700}
 /* 13.11.2026: изумрудные кнопки сливались с сайтом - на молочном тоже бронза */
 .btn-dark,.plate-light .btn-white{background:#B18A59;color:#10221E}
 .btn-dark:hover,.plate-light .btn-white:hover{background:#A07A4B}
-/* 13.11.2026: прозрачная кнопка WhatsApp сливалась с изумрудом - молочная заливка */
-.btn-wa,.mnav .btn-wa,.mnav-cta .btn-wa{background:#F8F6F0;color:#0F2E28;border-color:#F8F6F0}
-.btn-wa:hover{background:#EEE8DA;border-color:#EEE8DA}
-.btn-wa .ic{color:#0F2E28}
+/* 13.11.2026 (решение владельца): все кнопки WhatsApp - бронза, кнопки звонка - белые */
+a.btn[href*="wa.me"],.mnav-cta a.btn[href*="wa.me"],.sticky-bar a[href*="wa.me"]{background:#B18A59;color:#10221E;border-color:#B18A59}
+a.btn[href*="wa.me"]:hover,.mnav-cta a.btn[href*="wa.me"]:hover{background:#C29A67;border-color:#C29A67}
+.plate-light a.btn[href*="wa.me"]:hover,.sec-ice a.btn[href*="wa.me"]:hover{background:#A07A4B;border-color:#A07A4B}
+a.btn[href^="tel:"],.mnav-cta a.btn[href^="tel:"]{background:#FFFFFF;color:#0F2E28;border-color:#FFFFFF}
+a.btn[href^="tel:"]:hover,.mnav-cta a.btn[href^="tel:"]:hover{background:#F1EEE6;border-color:#F1EEE6}
