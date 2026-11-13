@@ -579,3 +579,7 @@ h1,h2,h3{margin:0;font-weight:700}
 /* 13.11.2026: изумрудные кнопки сливались с сайтом - на молочном тоже бронза */
 .btn-dark,.plate-light .btn-white{background:#B18A59;color:#10221E}
 .btn-dark:hover,.plate-light .btn-white:hover{background:#A07A4B}
+/* 13.11.2026: прозрачная кнопка WhatsApp сливалась с изумрудом - молочная заливка */
+.btn-wa,.mnav .btn-wa,.mnav-cta .btn-wa{background:#F8F6F0;color:#0F2E28;border-color:#F8F6F0}
+.btn-wa:hover{background:#EEE8DA;border-color:#EEE8DA}
+.btn-wa .ic{color:#0F2E28}
