@@ -136,7 +136,7 @@
     var spot = hero.querySelector('.spot'); if (spot) gsap.set(spot, { x: (pan + 1) * 455 });
     var lp = hero.querySelector('.lbl-pro'), ld = hero.querySelector('.lbl-def');
     if (lp) gsap.set(lp, { opacity: .6 - pan * .38 }); if (ld) gsap.set(ld, { opacity: .6 + pan * .38 });
-    var pr = hero.querySelector('.portrait-frame'); if (pr) gsap.set(pr, { x: (pan + 1) * -11 });
+    var pr = hero.querySelector('.portrait-frame'); if (pr) gsap.set(pr, { x: isMobile() ? 0 : (pan + 1) * -11 });
   }
   function setupHeroPan() {
     if (heroTl) { heroTl.scrollTrigger && heroTl.scrollTrigger.kill(); heroTl.kill(); heroTl = null; }
