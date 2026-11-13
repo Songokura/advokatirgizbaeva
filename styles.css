@@ -612,3 +612,18 @@ a.btn[href*="wa.me"]:hover,.mnav-cta a.btn[href*="wa.me"]:hover{background:#C29A
 .plate-light a.btn[href*="wa.me"]:hover,.sec-ice a.btn[href*="wa.me"]:hover{background:#A07A4B;border-color:#A07A4B}
 a.btn[href^="tel:"],.mnav-cta a.btn[href^="tel:"]{background:#FFFFFF;color:#0F2E28;border-color:#FFFFFF}
 a.btn[href^="tel:"]:hover,.mnav-cta a.btn[href^="tel:"]:hover{background:#F1EEE6;border-color:#F1EEE6}
+
+/* Лицензия (13.11.2026) */
+.lic{margin-top:32px;padding-top:26px;border-top:1px solid var(--line)}
+.sec-ice .lic{border-top-color:var(--line-ink)}
+.lic-row{display:flex;align-items:center;gap:14px}
+.lic-doc{flex:0 0 auto;width:96px;display:block;background:#fff;padding:4px;border:1px solid rgba(14,40,35,.18);box-shadow:0 14px 28px -16px rgba(14,40,35,.45);transition:transform var(--t1) var(--ease),box-shadow var(--t1) var(--ease)}
+.lic-doc img{display:block;width:100%;height:auto}
+.lic-doc:hover{transform:translateY(-3px);box-shadow:0 20px 34px -16px rgba(14,40,35,.55)}
+.lic-doc:focus-visible{outline:2px solid var(--blue-d);outline-offset:3px}
+.lic-txt{margin:0 0 0 8px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+@media (max-width:560px){
+  .lic-row{flex-wrap:wrap}
+  .lic-doc{width:calc(50% - 7px)}
+  .lic-txt{margin:4px 0 0;flex-basis:100%}
+}
