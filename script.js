@@ -236,7 +236,7 @@
       ScrollTrigger.create({
         trigger: sec, once: true,
         /* точка на 15% выше середины секции доходит до середины экрана; высокая секция - когда её верх на 30% экрана */
-        start: function () { return sec.offsetHeight > window.innerHeight * 1.05 ? 'top 30%' : '35% center'; },
+        start: function () { if (isMobile()) return 'top 82%'; return sec.offsetHeight > window.innerHeight * 1.05 ? 'top 30%' : '35% center'; },
         onEnter: function () { tl.timeScale(1.4).play(); }
       });
     });

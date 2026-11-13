@@ -9,7 +9,7 @@ window.SITE_KK = {
   "nav.kontakty": "Байланыс",
   "hdr.wa": "WhatsApp арқылы жазу",
 
-  "hero.kicker": "Астана · бүкіл Қазақстан бойынша · 24/7",
+  "hero.kicker": "Астана · бүкіл Қазақстан бойынша · 24/7",
   "hero.np1": "ПРОКУРОР",
   "hero.np1sub": "15 жыл",
   "hero.np2": "АДВОКАТ",

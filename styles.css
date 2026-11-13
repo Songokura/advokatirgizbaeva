@@ -556,6 +556,15 @@ h1,h2,h3{margin:0;font-weight:700}
   .sticky-bar a:first-child{background:var(--white);color:var(--ink)}
   .sticky-bar a:last-child{color:var(--txt);border-left:1px solid rgba(201,165,116,.25)}
   .foot{padding-bottom:32px}
+  /* 13.11.2026 мобильный: плиты и таблички по высоте содержимого, без пустых полей */
+  .plate{min-height:0}
+  .dp,.dp-tall,.tp{height:auto}
+  .dp-in,.tp-in{display:grid;height:auto}
+  .dp-face,.tp-face{position:relative;inset:auto;grid-area:1/1}
+  .dp-front{min-height:200px}
+  .dp-back{padding:26px 22px}
+  .hero-kicker{letter-spacing:.1em;gap:10px}
+  .hero-kicker::before{width:20px}
 }
 @media (max-width:420px){
   .brand-name{font-size:19px}
