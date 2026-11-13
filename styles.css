@@ -573,8 +573,9 @@ h1,h2,h3{margin:0;font-weight:700}
 .step-cases b{font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-d)}
 .step-tail{margin-top:14px;font-weight:500}
 
-/* Кнопки в палитре клиентки (12.11.2026): бронза на тёмном, изумруд на молочном */
+/* Кнопки в палитре клиентки (12.11.2026): бронза на тёмном и на молочном */
 .btn-white,.sec-inv .btn-dark{background:#B18A59;color:#10221E}
 .btn-white:hover,.sec-inv .btn-dark:hover{background:#C29A67}
-.btn-dark,.plate-light .btn-white{background:#174D43;color:#FFFFFF}
-.btn-dark:hover,.plate-light .btn-white:hover{background:#1E5C50}
+/* 13.11.2026: изумрудные кнопки сливались с сайтом - на молочном тоже бронза */
+.btn-dark,.plate-light .btn-white{background:#B18A59;color:#10221E}
+.btn-dark:hover,.plate-light .btn-white:hover{background:#A07A4B}
