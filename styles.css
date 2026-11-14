@@ -622,8 +622,14 @@ a.btn[href^="tel:"]:hover,.mnav-cta a.btn[href^="tel:"]:hover{background:#F1EEE6
 .lic-doc:hover{transform:translateY(-3px);box-shadow:0 20px 34px -16px rgba(14,40,35,.55)}
 .lic-doc:focus-visible{outline:2px solid var(--blue-d);outline-offset:3px}
 .lic-txt{margin:0 0 0 8px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+.lic--cert{margin-top:24px;padding-top:0;border-top:0}
+.lic--cert .lic-row{flex-wrap:wrap}
+.lic--cert .lic-doc{width:150px}
+.lic--cert .lic-doc img{aspect-ratio:16/10;object-fit:cover;object-position:left top;height:auto}
+.lic--cert .lic-txt{margin:4px 0 0;flex-basis:100%}
 @media (max-width:560px){
   .lic-row{flex-wrap:wrap}
   .lic-doc{width:calc(50% - 7px)}
   .lic-txt{margin:4px 0 0;flex-basis:100%}
+  .lic--cert .lic-doc{width:calc(33.333% - 10px)}
 }
