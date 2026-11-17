@@ -3,6 +3,46 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- Google tag (gtm.js) -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-T6Q673WC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  /* Конверсия: Интерактивные номера телефонов (клик по tel:) */
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') { window.location = url; }
+    };
+    gtag('event', 'conversion', {
+      'send_to': 'AW-18578014154/pi4vCNPYirodEMr_15pF',
+      'value': 1.0,
+      'currency': 'USD',
+      'event_callback': callback
+    });
+    return false;
+  }
+
+  /* Конверсия: Контакт (клик по WhatsApp) */
+  function gtag_report_contact() {
+    gtag('event', 'conversion', {
+      'send_to': 'AW-18578014154/1ugmCP-pirodEMr_15pF',
+      'value': 1.0,
+      'currency': 'USD'
+    });
+  }
+
+  /* Конверсия: Отправка формы для потенциальных клиентов */
+  function gtag_report_lead_form() {
+    gtag('event', 'conversion', {
+      'send_to': 'AW-18578014154/5FtuCNexirodEMr_15pF',
+      'value': 1.0,
+      'currency': 'USD'
+    });
+  }
+</script>
 <title>Адвокат по уголовным делам в Астане - Иргизбаева Д.К., экс-прокурор, 24/7</title>
 <meta name="description" content="Адвокат Иргизбаева Динара Кабденовна, Астана. Экс-прокурор с 15-летним стажем. Уголовные дела всех категорий, УДО и снятие судимости, развод и раздел имущества, договорные и административные дела. 400+ завершённых дел, 80 отзывов и 97 оценок «5» в 2ГИС. На связи 24/7, работа по всему Казахстану.">
 <meta property="og:type" content="website">
@@ -20,7 +60,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cuprum:wght@500;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/photos/foto-1.webp">
-<link rel="stylesheet" href="styles.css?v=20261116-1">
+<link rel="stylesheet" href="styles.css?v=20261117-1">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":["Attorney","LegalService","LocalBusiness"],"name":"Адвокат Иргизбаева Динара Кабденовна","telephone":"+77782580086","address":{"@type":"PostalAddress","addressLocality":"Астана","streetAddress":"пр. Сарыарка 13/1, офис 1203","addressCountry":"KZ"},"openingHours":"Mo-Su 00:00-23:59","areaServed":"Казахстан","sameAs":["https://2gis.kz/astana/geo/70000001082591181"],"image":"https://advokat-irgizbaeva.kz/assets/photos/foto-1.webp","url":"https://advokat-irgizbaeva.kz/"}
 </script>
@@ -692,6 +732,6 @@
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/SplitText.min.js" defer></script>
 <script src="assets/vendor/lenis.min.js" defer></script>
-<script src="script.js?v=20261116-1" defer></script>
+<script src="script.js?v=20261117-1" defer></script>
 </body>
 </html>
